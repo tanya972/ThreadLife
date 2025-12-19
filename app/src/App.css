@@ -1,0 +1,400 @@
+/* Utility classes for MaterialComparator component */
+
+.min-h-screen {
+  min-height: 100vh;
+}
+
+.bg-gradient-to-br {
+  background: linear-gradient(to bottom right, var(--tw-gradient-from), var(--tw-gradient-to));
+}
+
+.from-slate-50 {
+  --tw-gradient-from: #f8fafc;
+  --tw-gradient-to: #f1f5f9;
+}
+
+.to-slate-100 {
+  --tw-gradient-to: #f1f5f9;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.md\:p-8 {
+  @media (min-width: 768px) {
+    padding: 2rem;
+  }
+}
+
+.max-w-5xl {
+  max-width: 64rem;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
+.mt-8 {
+  margin-top: 2rem;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
+.md\:text-4xl {
+  @media (min-width: 768px) {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.bg-gradient-to-r {
+  background: linear-gradient(to right, var(--tw-gradient-from), var(--tw-gradient-to));
+}
+
+.from-emerald-600 {
+  --tw-gradient-from: #059669;
+}
+
+.to-teal-600 {
+  --tw-gradient-to: #0d9488;
+}
+
+.bg-clip-text {
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.text-transparent {
+  color: transparent;
+}
+
+.text-slate-600 {
+  color: #475569;
+}
+
+.text-slate-900 {
+  color: #0f172a;
+}
+
+.text-slate-500 {
+  color: #64748b;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.bg-white {
+  background-color: white;
+}
+
+.rounded-2xl {
+  border-radius: 1rem;
+}
+
+.rounded-xl {
+  border-radius: 0.75rem;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.border {
+  border-width: 1px;
+  border-color: #e2e8f0;
+}
+
+.border-l-4 {
+  border-left-width: 4px;
+}
+
+.border-blue-500 {
+  border-color: #3b82f6;
+}
+
+.border-orange-500 {
+  border-color: #f97316;
+}
+
+.border-cyan-500 {
+  border-color: #06b6d4;
+}
+
+.border-emerald-200 {
+  border-color: #a7f3d0;
+}
+
+.text-blue-600 {
+  color: #2563eb;
+}
+
+.text-orange-600 {
+  color: #ea580c;
+}
+
+.text-cyan-600 {
+  color: #0891b2;
+}
+
+.text-emerald-600 {
+  color: #059669;
+}
+
+.text-emerald-700 {
+  color: #047857;
+}
+
+.text-emerald-800 {
+  color: #065f46;
+}
+
+.text-green-600 {
+  color: #16a34a;
+}
+
+.text-red-600 {
+  color: #dc2626;
+}
+
+.text-slate-50 {
+  color: #f8fafc;
+}
+
+.grid {
+  display: grid;
+}
+
+.md\:grid-cols-3 {
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.md\:grid-cols-2 {
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.gap-3 {
+  gap: 0.75rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+
+.p-3 {
+  padding: 0.75rem;
+}
+
+.block {
+  display: block;
+}
+
+input[type="range"] {
+  width: 100%;
+}
+
+select, input {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
+input[type="range"] {
+  cursor: pointer;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.items-start {
+  align-items: flex-start;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.bg-gradient-to-r.from-emerald-50.to-teal-50 {
+  background: linear-gradient(to right, #ecfdf5, #f0fdfa);
+}
+
+.grid.gap-4 {
+  gap: 1rem;
+}
+
+button {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  background-color: white;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #f8fafc;
+}
+
+footer {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+/* MaterialComparator specific styles */
+.comparator-container {
+  min-height: 100vh;
+  background: linear-gradient(to bottom right, #f8fafc, #f1f5f9);
+  padding: 1rem;
+}
+
+.comparator-container header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.comparator-container header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(to right, #059669, #0d9488);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.comparator-container .card {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.comparator-container .metric-card {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  border-left-width: 4px;
+}
+
+.comparator-container .metric-card.border-blue {
+  border-left-color: #3b82f6;
+}
+
+.comparator-container .metric-card.border-orange {
+  border-left-color: #f97316;
+}
+
+.comparator-container .metric-card.border-cyan {
+  border-left-color: #06b6d4;
+}
+
+.comparator-container .suggestion-card {
+  background: linear-gradient(to right, #ecfdf5, #f0fdfa);
+  border: 1px solid #a7f3d0;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .comparator-container {
+    padding: 2rem;
+  }
+  
+  .comparator-container header h1 {
+    font-size: 3rem;
+  }
+}
