@@ -1,0 +1,8 @@
+activity_name,reference_product,reference_product_amount,material_type,country_or_region,subdivision,description,publication_year,citation,completedness_flag,input/output,compound_or_material,indicator_value,indicator_uom,compartment,comments
+Nylon 6 - nylon 6 fiber - raw material extraction and fiber production,Nylon 6 - nylon 6 fiber,1.0,Nylon 6,Unspecified geography,,"Source in document: Tables 8: Water requirements, and 9: CO2 emissions; Reference in the document: Boustead, I., 2005. Eco-profiles of the European Plastics Industry. Plastics Europe, Brussels.",2012.0,"Muthu, Subramanian Senthilkannan & Li, Yulan & Hu, Junyan & Mok, Tracy. (2012). Quantification of Environmental impact and ecological sustainability of textile fibers. Ecological Indicators. 13. 66–74. 10.1016/j.ecolind.2011.05.008.",Incomplete Elementary Flows,Input,Water,185.0,L,,
+Nylon 6 - nylon 6 fiber - raw material extraction and fiber production,Nylon 6 - nylon 6 fiber,1.0,Nylon 6,Unspecified geography,,"Source in document: Tables 8: Water requirements, and 9: CO2 emissions; Reference in the document: Boustead, I., 2005. Eco-profiles of the European Plastics Industry. Plastics Europe, Brussels.",2012.0,"Muthu, Subramanian Senthilkannan & Li, Yulan & Hu, Junyan & Mok, Tracy. (2012). Quantification of Environmental impact and ecological sustainability of textile fibers. Ecological Indicators. 13. 66–74. 10.1016/j.ecolind.2011.05.008.",Incomplete Elementary Flows,Output,Carbon Dioxide,5.5,kg,Air,
+,,,,,,,,,,,,,,,
+"Applied filters:
+Country or Region Filter Alias is Unspecified geography
+Activity Filter Alias is Nylon 6 - nylon 6 fiber - raw material extraction and fiber production
+Material Type Filter Alias is Nylon 6",,,,,,,,,,,,,,,

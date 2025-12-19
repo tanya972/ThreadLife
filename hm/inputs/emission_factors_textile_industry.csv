@@ -1,0 +1,8 @@
+input_key,unit,ef_kgco2e_per_unit,notes
+electricity,kwh,0.65,"Global textile production average: coal-heavy grids (China/India/Bangladesh/Vietnam/Turkey)"
+electricity,mj,0.18,"0.65 kgCO2e/kWh ÷ 3.6 MJ/kWh ≈ 0.18 kgCO2e/MJ"
+diesel,mj,0.074,"Cradle-to-gate diesel combustion + upstream, IPCC-based, typical for boiler/heat use"
+natural gas,mj,0.056,"Cradle-to-gate natural gas, including upstream leakage"
+coal,mj,0.095,"Cradle-to-gate coal for industrial boilers in textile mills"
+steam,mj,0.09,"Typical fossil-fired process steam in textile dyeing/finishing"
+thermal energy,mj,0.09,"Generic process heat (if modeling parameters say 'heat' or 'thermal energy')"
