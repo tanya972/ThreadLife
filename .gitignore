@@ -78,3 +78,15 @@ Thumbs.db
 # *.csv
 # *.pdf
 # *.joblib
+# Large model/data files
+*.joblib
+*.pkl
+*.h5
+*.csv
+*.xlsx
+data/
+*.parquet
+*.feather
+models/
+*.model
+*.weights

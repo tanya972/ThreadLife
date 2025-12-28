@@ -1,0 +1,20 @@
+{
+  "validation_summary": {
+    "repurchase_correlation": {
+      "pearson_r": 0.0,
+      "p_value": 1.0,
+      "interpretation": "Weak",
+      "significant": false
+    },
+    "price_quality_correlation": {
+      "pearson_r": 0.20745283245214646,
+      "p_value": 4.6990466048704736e-151,
+      "interpretation": "Weak",
+      "significant": true
+    },
+    "category_sanity_check": {
+      "passed": false
+    }
+  },
+  "overall_assessment": "NEEDS_IMPROVEMENT"
+}

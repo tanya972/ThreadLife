@@ -1,0 +1,43 @@
+{
+  "model_comparison": {
+    "Random Forest": {
+      "test_mae": 2.425797410323293,
+      "test_r2": 0.8506243906625515,
+      "cv_mae": 2.4166361696153116,
+      "test_rmse": 3.033068250855761
+    },
+    "Gradient Boosting": {
+      "test_mae": 2.412940385293807,
+      "test_r2": 0.8520711931397575,
+      "cv_mae": 2.4002515183856907,
+      "test_rmse": 3.018343865010345
+    },
+    "Ridge Regression": {
+      "test_mae": 2.4435824365643715,
+      "test_r2": 0.8484002763138857,
+      "cv_mae": 2.4286930401969404,
+      "test_rmse": 3.0555651139219404
+    },
+    "Neural Network": {
+      "test_mae": 2.4373054987266505,
+      "test_r2": 0.8488970147949759,
+      "cv_mae": 2.427825407153047,
+      "test_rmse": 3.0505550053462436
+    }
+  },
+  "best_model": "Gradient Boosting",
+  "best_model_mae": 2.412940385293807,
+  "best_model_r2": 0.8520711931397575,
+  "ensemble": {
+    "simple_mae": 2.415381522887859,
+    "simple_r2": 0.8518470023594693,
+    "weighted_mae": 2.415344652945471,
+    "weighted_r2": 0.8518515219643897,
+    "weights": {
+      "Random Forest": 0.25041766779764607,
+      "Gradient Boosting": 0.2517519843196466,
+      "Ridge Regression": 0.24859506311430557,
+      "Neural Network": 0.24923528476840187
+    }
+  }
+}

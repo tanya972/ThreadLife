@@ -1,0 +1,19 @@
+﻿# Models and data
+*.joblib
+*.pkl
+*.h5
+*.csv
+*.parquet
+data/
+models/
+ml/*.joblib
+ml/*.csv
+
+# Python
+__pycache__/
+*.pyc
+venv/
+env/
+
+# IDE
+.vscode/

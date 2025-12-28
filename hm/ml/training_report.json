@@ -1,0 +1,19 @@
+{
+  "data_path": "C:\\Users\\tanya\\data\\hm\\data\\hm\\hm_train_ready.csv",
+  "rows": 105542,
+  "features_used": [
+    "mat_score",
+    "median_gap_days",
+    "gap_months",
+    "category",
+    "product_group_name",
+    "graphical_appearance_name",
+    "colour_group_name",
+    "perceived_colour_value_name",
+    "index_group_name"
+  ],
+  "metrics": {
+    "mae_months": 2.549312613076352,
+    "r2": 0.8339502308934239
+  }
+}
