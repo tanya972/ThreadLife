@@ -1,118 +1,122 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Leaf } from 'lucide-react';
+import { searchProducts as fetchHMProducts } from '../services/hmApi'; // Rename import
 
 function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const searchProducts = async () => {
+  const handleSearch = async () => {  // Renamed from searchProducts
     if (!searchQuery.trim()) return;
     
     setLoading(true);
+    setError(null);
+    
     try {
-      const response = await fetch(`/api/scrape_hm?q=${encodeURIComponent(searchQuery)}`);
-      
-      if (response.ok) {
-        const data = await response.json();
-        setProducts(data);
-      } else {
-        throw new Error('API not available');
-      }
+      // Try real H&M API first
+      const results = await fetchHMProducts(searchQuery);
+      setProducts(results);
     } catch (error) {
-      console.log('Using local mock data');
+      console.error('API Error:', error);
+      setError('Failed to fetch products from H&M. Showing sample products.');
       
-      const mockProducts = [
-        {
-          id: '0970819001',
-          title: 'Relaxed Fit T-shirt',
-          price: '$9.99',
-          image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400',
-          link: 'https://www2.hm.com',
-          composition: { 'Cotton': 100 },
-          category: 't-shirt'
-        },
-        {
-          id: '1074406003',
-          title: 'Slim Fit Cotton Shirt',
-          price: '$17.99',
-          image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400',
-          link: 'https://www2.hm.com',
-          composition: { 'Cotton': 97, 'Elastane': 3 },
-          category: 'shirt'
-        },
-        {
-          id: '0608945065',
-          title: 'Printed Dress',
-          price: '$24.99',
-          image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400',
-          link: 'https://www2.hm.com',
-          composition: { 'Viscose': 95, 'Elastane': 5 },
-          category: 'dress'
-        },
-        {
-          id: '1005941013',
-          title: 'Skinny Jeans',
-          price: '$29.99',
-          image: 'https://images.unsplash.com/photo-1542272454315-7f6fabf90b1f?w=400',
-          link: 'https://www2.hm.com',
-          composition: { 'Cotton': 79, 'Polyester': 20, 'Elastane': 1 },
-          category: 'jeans'
-        },
-        {
-          id: '0685816050',
-          title: 'Fine-knit Sweater',
-          price: '$19.99',
-          image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400',
-          link: 'https://www2.hm.com',
-          composition: { 'Viscose': 80, 'Polyester': 20 },
-          category: 'sweater'
-        },
-        {
-          id: '0714032044',
-          title: 'Sports Leggings',
-          price: '$14.99',
-          image: 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=400',
-          link: 'https://www2.hm.com',
-          composition: { 'Polyester': 73, 'Polyamide': 20, 'Elastane': 7 },
-          category: 'activewear'
-        },
-        {
-          id: '0979945001',
-          title: 'Linen-blend Shirt',
-          price: '$24.99',
-          image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400',
-          link: 'https://www2.hm.com',
-          composition: { 'Linen': 55, 'Cotton': 45 },
-          category: 'shirt'
-        },
-        {
-          id: '1032572001',
-          title: 'Hooded Jacket',
-          price: '$39.99',
-          image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400',
-          link: 'https://www2.hm.com',
-          composition: { 'Polyester': 100 },
-          category: 'jacket'
-        }
-      ];
-
-      const filtered = mockProducts.filter(p => 
-        p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.category.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-
-      setProducts(filtered.length > 0 ? filtered : mockProducts);
+      // Fallback to mock data
+      const mockProducts = getMockProducts(searchQuery);
+      setProducts(mockProducts);
     }
+    
     setLoading(false);
   };
 
+  const getMockProducts = (query) => {
+    const mockProducts = [
+      {
+        id: '0970819001',
+        title: 'Relaxed Fit T-shirt',
+        price: '$9.99',
+        image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400',
+        link: 'https://www2.hm.com',
+        composition: { 'Cotton': 100 },
+        category: 't-shirt'
+      },
+      {
+        id: '1074406003',
+        title: 'Slim Fit Cotton Shirt',
+        price: '$17.99',
+        image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400',
+        link: 'https://www2.hm.com',
+        composition: { 'Cotton': 97, 'Elastane': 3 },
+        category: 'shirt'
+      },
+      {
+        id: '0608945065',
+        title: 'Printed Dress',
+        price: '$24.99',
+        image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400',
+        link: 'https://www2.hm.com',
+        composition: { 'Viscose': 95, 'Elastane': 5 },
+        category: 'dress'
+      },
+      {
+        id: '1005941013',
+        title: 'Skinny Jeans',
+        price: '$29.99',
+        image: 'https://images.unsplash.com/photo-1542272454315-7f6fabf90b1f?w=400',
+        link: 'https://www2.hm.com',
+        composition: { 'Cotton': 79, 'Polyester': 20, 'Elastane': 1 },
+        category: 'jeans'
+      },
+      {
+        id: '0685816050',
+        title: 'Fine-knit Sweater',
+        price: '$19.99',
+        image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400',
+        link: 'https://www2.hm.com',
+        composition: { 'Viscose': 80, 'Polyester': 20 },
+        category: 'sweater'
+      },
+      {
+        id: '0714032044',
+        title: 'Sports Leggings',
+        price: '$14.99',
+        image: 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=400',
+        link: 'https://www2.hm.com',
+        composition: { 'Polyester': 73, 'Polyamide': 20, 'Elastane': 7 },
+        category: 'activewear'
+      },
+      {
+        id: '0979945001',
+        title: 'Linen-blend Shirt',
+        price: '$24.99',
+        image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400',
+        link: 'https://www2.hm.com',
+        composition: { 'Linen': 55, 'Cotton': 45 },
+        category: 'shirt'
+      },
+      {
+        id: '1032572001',
+        title: 'Hooded Jacket',
+        price: '$39.99',
+        image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400',
+        link: 'https://www2.hm.com',
+        composition: { 'Polyester': 100 },
+        category: 'jacket'
+      }
+    ];
+
+    const queryLower = query.toLowerCase();
+    return mockProducts.filter(p => 
+      p.title.toLowerCase().includes(queryLower) ||
+      p.category.toLowerCase().includes(queryLower)
+    );
+  };
+
   const handleProductClick = (product) => {
-    // Store product data in sessionStorage
     sessionStorage.setItem('currentProduct', JSON.stringify(product));
-    // Navigate to product detail page
     navigate(`/product/${product.id}`);
   };
 
@@ -136,19 +140,19 @@ function HomePage() {
         <div className="search-box">
           <h2>Search H&M Products</h2>
           <p style={{textAlign: 'center', color: '#6b7280', fontSize: '14px', marginBottom: '16px'}}>
-            Try: "dress", "jeans", "sweater", "cotton"
+            Try: "dress", "jeans", "sweater", "cotton shirt"
           </p>
           <div className="search-form">
             <input
               type="text"
-              placeholder="e.g., striped shirt, knit dress, denim jeans..."
+              placeholder="Search real H&M products..."
               className="search-input"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && searchProducts()}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
             />
             <button
-              onClick={searchProducts}
+              onClick={handleSearch}
               disabled={loading}
               className="search-button"
             >
@@ -156,6 +160,11 @@ function HomePage() {
               <span>{loading ? 'Searching...' : 'Search'}</span>
             </button>
           </div>
+          {error && (
+            <p style={{color: '#ef4444', fontSize: '14px', marginTop: '12px', textAlign: 'center'}}>
+              {error}
+            </p>
+          )}
         </div>
       </div>
 
@@ -209,7 +218,7 @@ function HomePage() {
   );
 }
 
-// Stacked Bar Component (Single Bar)
+// Stacked Bar Component
 function StackedBar({ composition, height = 20 }) {
   const COLORS = {
     'Cotton': '#10b981',
@@ -228,8 +237,7 @@ function StackedBar({ composition, height = 20 }) {
     'Polyamide': '#dc2626',
     'Recycled Nylon': '#fb923c',
     'Modal': '#14b8a6',
-    'Alpaca': '#a855f7',
-    'Organic Linen': '#bef264'
+    'Silk': '#ec4899'
   };
 
   return (

@@ -1,5 +1,7 @@
+"use client";
+
 import React, { useState, useMemo } from 'react';
-import './MaterialComparator.css';
+import './materialcomparator.css';
 
 // Material impact database
 const MATERIAL_DATA = {
@@ -113,6 +115,35 @@ function calculateImpact(composition, garmentMassKg = 0.25) {
   
   return { co2: co2Total, water: waterTotal };
 }
+
+// Custom RangeInput component with gradient
+const RangeInput = ({ material, value, onChange }) => {
+  const percentage = (value * 100).toFixed(0);
+  
+  return (
+    <div className="material-slider">
+      <div className="material-label">
+        <span>{MATERIAL_DATA[material]?.name || material}</span>
+        <span className="percentage">{percentage}%</span>
+      </div>
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.05"
+        value={value}
+        onChange={onChange}
+        style={{
+          background: `linear-gradient(to right, 
+            var(--color-primary) 0%, 
+            var(--color-primary) ${percentage}%, 
+            var(--color-border) ${percentage}%, 
+            var(--color-border) 100%)`
+        }}
+      />
+    </div>
+  );
+};
 
 export default function MaterialComparator() {
   const [currentComposition, setCurrentComposition] = useState({
@@ -234,13 +265,13 @@ export default function MaterialComparator() {
         <header>
           <h1>Material Impact Calculator</h1>
           <p>
-            See how switching materials affects garment lifespan and environmental impact. 
-            Powered by real-world sustainability data.
+            Discover how material choices affect garment lifespan and environmental impact. 
+            Make informed decisions for a more sustainable wardrobe.
           </p>
         </header>
         
         <div className="card">
-          <h2>Current Material Configuration</h2>
+          <h2>Configure Your Garment</h2>
           
           <div className="config-row">
             <div className="config-col">
@@ -275,25 +306,17 @@ export default function MaterialComparator() {
             {Object.entries(MATERIAL_DATA).filter(([mat]) => 
               ['cotton', 'recycled_cotton', 'polyester', 'recycled_polyester', 'wool', 'linen', 'elastane'].includes(mat)
             ).map(([mat, data]) => (
-              <div key={mat} className="material-slider">
-                <div className="material-label">
-                  <span>{data.name}</span>
-                  <span className="percentage">{(currentComposition[mat] || 0) * 100}%</span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.05"
-                  value={currentComposition[mat] || 0}
-                  onChange={e => updateComposition(mat, parseFloat(e.target.value))}
-                />
-              </div>
+              <RangeInput
+                key={mat}
+                material={mat}
+                value={currentComposition[mat] || 0}
+                onChange={e => updateComposition(mat, parseFloat(e.target.value))}
+              />
             ))}
           </div>
           
           <div className="total-percentage">
-            Total: {Object.values(currentComposition).reduce((a, b) => a + (b || 0), 0) * 100}%
+            Total: {(Object.values(currentComposition).reduce((a, b) => a + (b || 0), 0) * 100).toFixed(0)}%
           </div>
         </div>
         
@@ -319,7 +342,7 @@ export default function MaterialComparator() {
         
         {suggestions.length > 0 && (
           <div className="suggestions">
-            <h2>Material Improvement Suggestions</h2>
+            <h2>Improvement Suggestions</h2>
             <div className="suggestions-list">
               {suggestions.map((suggestion, idx) => (
                 <div key={idx} className="suggestion-card">
@@ -335,15 +358,15 @@ export default function MaterialComparator() {
                       </div>
                     </div>
                     <div className="suggestion-impact">
-                      <div className="delta-value green">+{suggestion.deltaLifespan.toFixed(1)} mo</div>
-                      <div className="delta-label">lifespan increase</div>
+                      <div className="delta-value green">+{suggestion.deltaLifespan.toFixed(1)}</div>
+                      <div className="delta-label">mo longer</div>
                     </div>
                   </div>
                   
                   <div className="suggestion-metrics">
                     <div className="mini-metric">
                       <div className="mini-label">New Lifespan</div>
-                      <div className="mini-value">{suggestion.lifespan.toFixed(1)} months</div>
+                      <div className="mini-value">{suggestion.lifespan.toFixed(1)} mo</div>
                     </div>
                     <div className="mini-metric">
                       <div className="mini-label">Δ CO₂</div>
@@ -365,7 +388,7 @@ export default function MaterialComparator() {
         )}
         
         <div className="reference-section">
-          <h3>Material Reference</h3>
+          <h3>Material Reference Guide</h3>
           <div className="reference-grid">
             {Object.entries(MATERIAL_DATA).map(([key, data]) => (
               <div key={key} className="reference-item">
