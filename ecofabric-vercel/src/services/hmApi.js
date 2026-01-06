@@ -3,275 +3,248 @@ import axios from 'axios';
 const RAPIDAPI_KEY = '636a52f114msh5e592d08d7fb6eep118b9fjsn4a25d3e20db6';
 const RAPIDAPI_HOST = 'apidojo-hm-hennes-mauritz-v1.p.rapidapi.com';
 
-console.log('🔑 API Key loaded:', RAPIDAPI_KEY ? 'YES ✓' : 'NO ✗');
+console.log('🔑 Using H&M API with Category Mapping - IMAGE FIX');
 
-export const searchProducts = async (query) => {
-  console.log('🔍 Searching H&M for:', query);
+const CATEGORY_MAP = {
+  'dress': 'ladies_dresses',
+  'dresses': 'ladies_dresses',
+  'top': 'ladies_tops',
+  'tops': 'ladies_tops',
+  'shirt': 'ladies_shirts_blouses',
+  'blouse': 'ladies_shirts_blouses',
+  'jeans': 'ladies_jeans',
+  'denim': 'ladies_jeans',
+  'pants': 'ladies_trousers',
+  'trousers': 'ladies_trousers',
+  'skirt': 'ladies_skirts',
+  'jacket': 'ladies_jacketscoats',
+  'coat': 'ladies_jacketscoats',
+  'sweater': 'ladies_cardigansjumpers',
+  'cardigan': 'ladies_cardigansjumpers',
+  'hoodie': 'ladies_hoodiesswetshirts',
+  'sweatshirt': 'ladies_hoodiesswetshirts'
+};
 
-  if (!RAPIDAPI_KEY || RAPIDAPI_KEY === 'your-fallback-key-here') {
-    throw new Error('API key not configured. Please add REACT_APP_RAPIDAPI_KEY to .env file');
-  }
+export const searchProducts = async (query = '', maxProducts = 5) => {
+  console.log(`🔍 Searching H&M for: "${query}" (max ${maxProducts} products)`);
 
   try {
-    const response = await axios({
+    const categoryId = getCategoryFromQuery(query);
+    console.log(`📂 Using category: ${categoryId}`);
+
+    // STEP 1: Get product list
+    const listResponse = await axios({
       method: 'GET',
-      url: 'https://apidojo-hm-hennes-mauritz-v1.p.rapidapi.com/products/list',
+      url: `https://${RAPIDAPI_HOST}/products/v2/list`,
       params: {
         country: 'us',
         lang: 'en',
-        currentpage: '0',
-        pagesize: '30',
-        query: query
+        page: 1,
+        pageSize: maxProducts,
+        categoryId: categoryId,
+        sort: 'RELEVANCE'
       },
       headers: {
-        'X-RapidAPI-Key': RAPIDAPI_KEY,
-        'X-RapidAPI-Host': RAPIDAPI_HOST
+        'x-rapidapi-host': RAPIDAPI_HOST,
+        'x-rapidapi-key': RAPIDAPI_KEY
+      },
+      timeout: 10000
+    });
+
+    const productList = listResponse.data?.plpList?.productList || [];
+    console.log(`📦 Found ${productList.length} products in category`);
+
+    if (productList.length === 0) {
+      throw new Error('No products found in category');
+    }
+
+    // Create a map of article IDs to list data (for images)
+    const listDataMap = {};
+    productList.forEach(p => {
+      const articleId = p.swatches?.[0]?.articleId || p.id;
+      if (articleId) {
+        listDataMap[articleId] = p;
       }
     });
 
-    console.log('✅ Raw API Response:', response);
-    console.log('✅ Response Data:', response.data);
+    const productCodes = Object.keys(listDataMap).slice(0, maxProducts);
+    console.log(`📦 Got ${productCodes.length} product codes`);
 
-    // Handle different response structures
-    let productsArray = [];
+    // STEP 2: Get details for composition
+    const detailPromises = productCodes.map(code => 
+      fetchProductDetail(code, listDataMap[code])
+    );
+    const products = await Promise.all(detailPromises);
+    
+    const validProducts = products.filter(Boolean);
+    console.log(`✅ Got complete details for ${validProducts.length} products`);
 
-    // Try different possible data structures
-    if (response.data && response.data.results) {
-      productsArray = response.data.results;
-      console.log('📦 Found results array with', productsArray.length, 'items');
-    } else if (response.data && response.data.products) {
-      productsArray = response.data.products;
-      console.log('📦 Found products array with', productsArray.length, 'items');
-    } else if (Array.isArray(response.data)) {
-      productsArray = response.data;
-      console.log('📦 Response is array with', productsArray.length, 'items');
-    } else {
-      console.error('❌ Unexpected response structure:', response.data);
-      throw new Error('Unexpected API response structure');
-    }
-
-    if (!productsArray || productsArray.length === 0) {
-      console.warn('⚠️ No products found for:', query);
-      throw new Error('No products found');
-    }
-
-    // Transform products
-    const transformedProducts = productsArray
-      .filter(item => item && (item.name || item.title)) // Filter out invalid items
-      .map((item, index) => {
-        console.log(`📦 Processing item ${index}:`, item);
-
-        return {
-          id: getProductId(item, index),
-          title: getProductTitle(item),
-          price: getProductPrice(item),
-          image: getProductImage(item),
-          link: getProductLink(item),
-          composition: getProductComposition(item),
-          category: getProductCategory(item)
-        };
-      });
-
-    console.log('✅ Successfully transformed', transformedProducts.length, 'products');
-    console.log('✅ Sample product:', transformedProducts[0]);
-
-    return transformedProducts;
+    return validProducts;
 
   } catch (error) {
-    console.error('❌ H&M API Error:');
-    console.error('  Message:', error.message);
-    console.error('  Status:', error.response?.status);
-    console.error('  Status Text:', error.response?.statusText);
-    console.error('  Response Data:', error.response?.data);
-    console.error('  Full Error:', error);
-
-    // Provide helpful error messages
-    if (error.response?.status === 403) {
-      throw new Error('Not subscribed to H&M API. Please subscribe on RapidAPI.');
-    } else if (error.response?.status === 401) {
-      throw new Error('Invalid API key. Please check your REACT_APP_RAPIDAPI_KEY in .env file.');
-    } else if (error.response?.status === 429) {
-      throw new Error('API rate limit exceeded. Please wait or upgrade your plan.');
-    }
-
+    console.error('❌ H&M API Error:', error.message);
     throw error;
   }
 };
 
-// Helper Functions
-
-function getProductId(item, index) {
-  return item.articleCode || 
-         item.code || 
-         item.id || 
-         item.defaultArticle?.code ||
-         `product-${index}`;
+function getCategoryFromQuery(query) {
+  if (!query) return 'ladies_all';
+  
+  const queryLower = query.toLowerCase().trim();
+  
+  if (CATEGORY_MAP[queryLower]) {
+    return CATEGORY_MAP[queryLower];
+  }
+  
+  for (const [term, category] of Object.entries(CATEGORY_MAP)) {
+    if (queryLower.includes(term)) {
+      return category;
+    }
+  }
+  
+  return 'ladies_all';
 }
 
-function getProductTitle(item) {
-  return item.name || 
-         item.title || 
-         item.defaultArticle?.name ||
-         'Untitled Product';
+async function fetchProductDetail(productCode, listData) {
+  try {
+    const response = await axios({
+      method: 'GET',
+      url: `https://${RAPIDAPI_HOST}/products/detail`,
+      params: {
+        productcode: productCode,
+        country: 'us',
+        lang: 'en'
+      },
+      headers: {
+        'x-rapidapi-host': RAPIDAPI_HOST,
+        'x-rapidapi-key': RAPIDAPI_KEY
+      },
+      timeout: 10000
+    });
+
+    const data = response.data.product || response.data;
+
+    return {
+      id: data.code,
+      title: data.name || 'Untitled Product',
+      price: formatPrice(data, listData),
+      image: getProductImage(listData, data), // Use listData FIRST
+      link: data.productUrl || `https://www2.hm.com/en_us/productpage.${data.code}.html`,
+      composition: extractComposition(data),
+      description: data.description || '',
+      category: getCategoryFromData(data)
+    };
+
+  } catch (error) {
+    console.error(`  ❌ Failed to get details for ${productCode}:`, error.message);
+    return null;
+  }
 }
 
-function getProductPrice(item) {
-  // Try multiple price fields
-  if (item.price?.value) {
-    return `$${parseFloat(item.price.value).toFixed(2)}`;
+/**
+ * Get product image - prioritize list response data
+ */
+function getProductImage(listData, detailData) {
+  // PRIORITY 1: List response has the best images
+  if (listData) {
+    if (listData.productImage) {
+      console.log('  🖼️ Using productImage from list');
+      return listData.productImage;
+    }
+    if (listData.modelImage) {
+      console.log('  🖼️ Using modelImage from list');
+      return listData.modelImage;
+    }
+    if (listData.images?.[0]?.url) {
+      console.log('  🖼️ Using images[0] from list');
+      return listData.images[0].url;
+    }
   }
-  if (item.price?.formattedValue) {
-    return item.price.formattedValue;
+
+  // PRIORITY 2: Detail response galleryDetails
+  if (detailData?.galleryDetails && detailData.galleryDetails.length > 0) {
+    const mainImage = detailData.galleryDetails.find(img => 
+      img.assetType === 'DESCRIPTIVESTILLLIFE'
+    ) || detailData.galleryDetails[0];
+    
+    if (mainImage?.baseUrl) {
+      console.log('  🖼️ Using galleryDetails from detail');
+      return mainImage.baseUrl;
+    }
   }
-  if (item.whitePrice?.value) {
-    return `$${parseFloat(item.whitePrice.value).toFixed(2)}`;
+
+  // PRIORITY 3: Detail response images array
+  if (detailData?.images && detailData.images.length > 0) {
+    const imageUrl = detailData.images[0].baseUrl || detailData.images[0].url;
+    if (imageUrl) {
+      console.log('  🖼️ Using images array from detail');
+      return imageUrl.startsWith('http') ? imageUrl : `https:${imageUrl}`;
+    }
   }
-  if (item.defaultArticle?.whitePrice?.value) {
-    return `$${parseFloat(item.defaultArticle.whitePrice.value).toFixed(2)}`;
+
+  console.log('  ❌ No image found!');
+  return 'https://via.placeholder.com/400?text=No+Image';
+}
+
+function formatPrice(detailData, listData) {
+  // Try detail response first
+  let price = detailData?.whitePrice?.price || 
+              detailData?.price?.value || 
+              detailData?.redPrice?.value;
+  
+  // Fallback to list response
+  if (!price && listData?.prices?.[0]?.price) {
+    price = listData.prices[0].price;
   }
-  if (typeof item.price === 'string') {
-    return item.price;
-  }
-  if (typeof item.price === 'number') {
-    return `$${item.price.toFixed(2)}`;
+  
+  if (price) {
+    return `$${parseFloat(price).toFixed(2)}`;
   }
   return '$0.00';
 }
 
-function getProductImage(item) {
-  // Try multiple image fields
-  const imageUrl = 
-    item.images?.[0]?.url ||
-    item.images?.[0]?.baseUrl ||
-    item.image?.url ||
-    item.defaultArticle?.images?.[0]?.url ||
-    item.defaultArticle?.images?.[0]?.baseUrl ||
-    item.galleryImages?.[0]?.url ||
-    item.galleryImages?.[0]?.baseUrl ||
-    null;
-
-  if (!imageUrl) {
-    return 'https://via.placeholder.com/400?text=No+Image+Available';
-  }
-
-  // H&M images might need full URL
-  if (imageUrl.startsWith('http')) {
-    return imageUrl;
-  } else if (imageUrl.startsWith('//')) {
-    return 'https:' + imageUrl;
-  } else {
-    return imageUrl;
-  }
-}
-
-function getProductLink(item) {
-  const articleCode = item.articleCode || item.code || item.defaultArticle?.code;
-  if (articleCode) {
-    return `https://www2.hm.com/en_us/productpage.${articleCode}.html`;
-  }
-  return 'https://www2.hm.com';
-}
-
-function getProductComposition(item) {
-  // Try to extract composition from various fields
-  const compositionSources = [
-    item.fabricComposition,
-    item.composition,
-    item.materialComposition,
-    item.defaultArticle?.fabricComposition,
-    item.articlesList?.[0]?.fabricComposition,
-    item.description
-  ];
-
-  for (const source of compositionSources) {
-    if (source && typeof source === 'string') {
-      const parsed = parseCompositionText(source);
-      if (Object.keys(parsed).length > 0) {
-        console.log('🧵 Found composition:', parsed, 'from:', source);
-        return parsed;
-      }
-    }
-  }
-
-  // Fallback: guess from product name
-  const productName = item.name || item.title || '';
-  console.log('🧵 Guessing composition from name:', productName);
-  return guessCompositionFromName(productName);
-}
-
-function parseCompositionText(text) {
+function extractComposition(data) {
   const composition = {};
-  
-  // Remove HTML tags if any
-  text = text.replace(/<[^>]*>/g, '');
-  
-  // Multiple regex patterns to match different formats
-  const patterns = [
-    /(\d+)%\s*([A-Za-z\s]+?)(?=\s*\d+%|$|,|\.|;)/gi,  // "60% Cotton"
-    /([A-Za-z\s]+?)\s*:?\s*(\d+)%/gi,                  // "Cotton: 60%" or "Cotton 60%"
-    /([A-Za-z\s]+?)\s+(\d+)\s*%/gi                     // "Cotton 60 %"
-  ];
 
-  for (const pattern of patterns) {
-    const matches = [...text.matchAll(pattern)];
-    
-    for (const match of matches) {
-      let material, percentage;
-      
-      // Determine which group is the number
-      if (!isNaN(match[1])) {
-        percentage = parseInt(match[1]);
-        material = match[2];
-      } else {
-        material = match[1];
-        percentage = parseInt(match[2]);
-      }
+  if (data.compositions && Array.isArray(data.compositions)) {
+    const mainComposition = data.compositions.find(c => 
+      c.compositionType === 'Shell' || !c.compositionType
+    ) || data.compositions[0];
 
-      // Clean and normalize material name
-      material = material.trim();
-      material = normalizeMaterialName(material);
-      
-      // Only add valid percentages
-      if (percentage > 0 && percentage <= 100 && material) {
-        composition[material] = percentage;
-      }
-    }
-    
-    // If we found valid composition, stop trying other patterns
-    if (Object.keys(composition).length > 0) {
-      break;
+    if (mainComposition && mainComposition.materials) {
+      mainComposition.materials.forEach(material => {
+        const name = normalizeMaterialName(material.name);
+        const percentage = parseFloat(material.percentage);
+        
+        if (name && !isNaN(percentage) && percentage > 0) {
+          composition[name] = Math.round(percentage);
+        }
+      });
     }
   }
 
-  // Normalize percentages to sum to 100
-  const total = Object.values(composition).reduce((sum, val) => sum + val, 0);
-  if (total > 0 && total !== 100) {
-    Object.keys(composition).forEach(key => {
-      composition[key] = Math.round((composition[key] / total) * 100);
-    });
+  if (Object.keys(composition).length === 0) {
+    return guessComposition(data.name, data.description);
   }
 
   return composition;
 }
 
 function normalizeMaterialName(material) {
-  // Remove extra spaces and convert to title case
-  material = material.trim().replace(/\s+/g, ' ');
+  if (!material) return '';
   
   const materialMap = {
     'cotton': 'Cotton',
     'organic cotton': 'Organic Cotton',
     'polyester': 'Polyester',
     'recycled polyester': 'Recycled Polyester',
-    'viscose': 'Viscose',
-    'rayon': 'Viscose',
     'elastane': 'Elastane',
     'spandex': 'Elastane',
-    'lycra': 'Elastane',
+    'viscose': 'Viscose',
+    'rayon': 'Viscose',
     'nylon': 'Nylon',
-    'polyamide': 'Polyamide',
+    'polyamide': 'Nylon',
     'wool': 'Wool',
-    'merino': 'Wool',
     'linen': 'Linen',
     'acrylic': 'Acrylic',
     'modal': 'Modal',
@@ -280,74 +253,50 @@ function normalizeMaterialName(material) {
     'silk': 'Silk'
   };
 
-  const normalized = material.toLowerCase();
-  return materialMap[normalized] || material.charAt(0).toUpperCase() + material.slice(1).toLowerCase();
+  const normalized = material.toLowerCase().trim();
+  return materialMap[normalized] || 
+         material.charAt(0).toUpperCase() + material.slice(1).toLowerCase();
 }
 
-function guessCompositionFromName(name) {
-  const nameLower = name.toLowerCase();
+function getCategoryFromData(data) {
+  const name = (data.name || '').toLowerCase();
+  const desc = (data.description || '').toLowerCase();
+  const text = name + ' ' + desc;
   
-  // Look for material keywords in product name
-  if (nameLower.includes('cotton') && nameLower.includes('poly')) {
-    return { 'Cotton': 65, 'Polyester': 35 };
-  }
-  if (nameLower.includes('organic cotton')) {
-    return { 'Organic Cotton': 100 };
-  }
-  if (nameLower.includes('cotton')) {
-    return { 'Cotton': 100 };
-  }
-  if (nameLower.includes('denim') || nameLower.includes('jean')) {
-    return { 'Cotton': 98, 'Elastane': 2 };
-  }
-  if (nameLower.includes('linen')) {
-    return { 'Linen': 100 };
-  }
-  if (nameLower.includes('wool')) {
-    return { 'Wool': 100 };
-  }
-  if (nameLower.includes('silk')) {
-    return { 'Silk': 100 };
-  }
-  if (nameLower.includes('polyester')) {
-    return { 'Polyester': 100 };
-  }
-  if (nameLower.includes('viscose')) {
-    return { 'Viscose': 100 };
-  }
-  if (nameLower.includes('knit') || nameLower.includes('sweater')) {
-    return { 'Acrylic': 50, 'Polyester': 30, 'Wool': 20 };
-  }
-  
-  // Default blend
-  return { 'Cotton': 60, 'Polyester': 40 };
-}
-
-function getProductCategory(item) {
-  const sources = [
-    item.categoryName,
-    item.category,
-    item.name,
-    item.title,
-    item.defaultArticle?.categoryName
-  ].filter(Boolean);
-
-  for (const source of sources) {
-    const nameLower = source.toLowerCase();
-    
-    if (nameLower.includes('dress')) return 'dress';
-    if (nameLower.includes('sweater') || nameLower.includes('cardigan') || nameLower.includes('knit') || nameLower.includes('jumper')) return 'sweater';
-    if (nameLower.includes('shirt') || nameLower.includes('blouse')) return 'shirt';
-    if (nameLower.includes('t-shirt') || nameLower.includes('tee') || nameLower.includes('tank')) return 't-shirt';
-    if (nameLower.includes('jean') || nameLower.includes('denim')) return 'jeans';
-    if (nameLower.includes('jacket') || nameLower.includes('coat') || nameLower.includes('blazer')) return 'jacket';
-    if (nameLower.includes('trouser') || nameLower.includes('pant') || nameLower.includes('chino')) return 'pants';
-    if (nameLower.includes('skirt')) return 'skirt';
-    if (nameLower.includes('short')) return 'shorts';
-    if (nameLower.includes('legging')) return 'activewear';
-  }
+  if (text.includes('dress')) return 'dress';
+  if (text.includes('hoodie') || text.includes('sweatshirt')) return 'hoodie';
+  if (text.includes('sweater') || text.includes('cardigan')) return 'sweater';
+  if (text.includes('shirt') || text.includes('blouse')) return 'shirt';
+  if (text.includes('t-shirt') || text.includes('tee')) return 't-shirt';
+  if (text.includes('jean') || text.includes('denim')) return 'jeans';
+  if (text.includes('jacket') || text.includes('coat')) return 'jacket';
   
   return 'top';
+}
+
+function guessComposition(name, description) {
+  const text = ((name || '') + ' ' + (description || '')).toLowerCase();
+  
+  if (text.includes('cotton') && text.includes('poly')) {
+    return { 'Cotton': 60, 'Polyester': 40 };
+  }
+  if (text.includes('organic cotton')) {
+    return { 'Organic Cotton': 100 };
+  }
+  if (text.includes('cotton')) {
+    return { 'Cotton': 100 };
+  }
+  if (text.includes('denim') || text.includes('jean')) {
+    return { 'Cotton': 98, 'Elastane': 2 };
+  }
+  if (text.includes('linen')) {
+    return { 'Linen': 100 };
+  }
+  if (text.includes('wool')) {
+    return { 'Wool': 100 };
+  }
+  
+  return { 'Cotton': 60, 'Polyester': 40 };
 }
 
 export default { searchProducts };
