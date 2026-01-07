@@ -3,15 +3,18 @@ import axios from 'axios';
 const RAPIDAPI_KEY = '636a52f114msh5e592d08d7fb6eep118b9fjsn4a25d3e20db6';
 const RAPIDAPI_HOST = 'apidojo-hm-hennes-mauritz-v1.p.rapidapi.com';
 
-console.log('🔑 Using H&M API with Category Mapping - IMAGE FIX');
+console.log('🔑 H&M API - Multi-Page Fetching');
 
 const CATEGORY_MAP = {
   'dress': 'ladies_dresses',
   'dresses': 'ladies_dresses',
   'top': 'ladies_tops',
   'tops': 'ladies_tops',
-  'shirt': 'ladies_shirts_blouses',
-  'blouse': 'ladies_shirts_blouses',
+  'shirt': 'ladies_tops',
+  'shirts': 'ladies_tops',
+  'blouse': 'ladies_tops',
+  'tshirt': 'ladies_tops',
+  't-shirt': 'ladies_tops',
   'jeans': 'ladies_jeans',
   'denim': 'ladies_jeans',
   'pants': 'ladies_trousers',
@@ -22,7 +25,9 @@ const CATEGORY_MAP = {
   'sweater': 'ladies_cardigansjumpers',
   'cardigan': 'ladies_cardigansjumpers',
   'hoodie': 'ladies_hoodiesswetshirts',
-  'sweatshirt': 'ladies_hoodiesswetshirts'
+  'sweatshirt': 'ladies_hoodiesswetshirts',
+  'swimwear': 'ladies_swimwear',
+  'swimsuit': 'ladies_swimwear'
 };
 
 export const searchProducts = async (query = '', maxProducts = 5) => {
@@ -32,16 +37,88 @@ export const searchProducts = async (query = '', maxProducts = 5) => {
     const categoryId = getCategoryFromQuery(query);
     console.log(`📂 Using category: ${categoryId}`);
 
-    // STEP 1: Get product list
-    const listResponse = await axios({
+    // Calculate how many pages we need to fetch
+    const productsPerPage = 30; // H&M API max per request
+    const pagesToFetch = Math.ceil(maxProducts / productsPerPage);
+    console.log(`📄 Will fetch ${pagesToFetch} pages to get ${maxProducts} products`);
+
+    let allProducts = [];
+
+    // Fetch multiple pages
+    for (let page = 1; page <= pagesToFetch; page++) {
+      console.log(`📋 Fetching page ${page}/${pagesToFetch}...`);
+      
+      const listResponse = await axios({
+        method: 'GET',
+        url: `https://${RAPIDAPI_HOST}/products/v2/list`,
+        params: {
+          country: 'us',
+          lang: 'en',
+          page: page,
+          pageSize: productsPerPage,
+          categoryId: categoryId,
+          sort: 'RELEVANCE'
+        },
+        headers: {
+          'x-rapidapi-host': RAPIDAPI_HOST,
+          'x-rapidapi-key': RAPIDAPI_KEY
+        },
+        timeout: 10000
+      });
+
+      const productList = listResponse.data?.plpList?.productList || [];
+      console.log(`  📦 Page ${page}: Got ${productList.length} products`);
+
+      if (productList.length === 0) {
+        console.log(`  ⚠️ Page ${page} returned 0 products, stopping...`);
+        break;
+      }
+
+      allProducts = allProducts.concat(productList);
+      console.log(`  📊 Total so far: ${allProducts.length} products`);
+
+      // Stop if we have enough
+      if (allProducts.length >= maxProducts) {
+        console.log(`  ✅ Reached target of ${maxProducts} products`);
+        break;
+      }
+    }
+
+    console.log(`📦 Total fetched: ${allProducts.length} products`);
+
+    if (allProducts.length === 0) {
+      console.warn(`⚠️ No products in "${categoryId}", trying "ladies_all" instead...`);
+      return await fetchFromLadiesAll(query, maxProducts);
+    }
+
+    // Limit to maxProducts
+    const productsToProcess = allProducts.slice(0, maxProducts);
+    return await processProducts(productsToProcess);
+
+  } catch (error) {
+    console.error('❌ H&M API Error:', error.message);
+    throw error;
+  }
+};
+
+// Fallback: fetch from ladies_all and filter
+async function fetchFromLadiesAll(query, maxProducts) {
+  console.log('📋 Fetching from ladies_all as fallback...');
+  
+  const productsPerPage = 30;
+  const pagesToFetch = Math.ceil(maxProducts / productsPerPage);
+  let allProducts = [];
+
+  for (let page = 1; page <= pagesToFetch; page++) {
+    const response = await axios({
       method: 'GET',
       url: `https://${RAPIDAPI_HOST}/products/v2/list`,
       params: {
         country: 'us',
         lang: 'en',
-        page: 1,
-        pageSize: maxProducts,
-        categoryId: categoryId,
+        page: page,
+        pageSize: productsPerPage,
+        categoryId: 'ladies_all',
         sort: 'RELEVANCE'
       },
       headers: {
@@ -51,41 +128,52 @@ export const searchProducts = async (query = '', maxProducts = 5) => {
       timeout: 10000
     });
 
-    const productList = listResponse.data?.plpList?.productList || [];
-    console.log(`📦 Found ${productList.length} products in category`);
-
-    if (productList.length === 0) {
-      throw new Error('No products found in category');
-    }
-
-    // Create a map of article IDs to list data (for images)
-    const listDataMap = {};
-    productList.forEach(p => {
-      const articleId = p.swatches?.[0]?.articleId || p.id;
-      if (articleId) {
-        listDataMap[articleId] = p;
-      }
-    });
-
-    const productCodes = Object.keys(listDataMap).slice(0, maxProducts);
-    console.log(`📦 Got ${productCodes.length} product codes`);
-
-    // STEP 2: Get details for composition
-    const detailPromises = productCodes.map(code => 
-      fetchProductDetail(code, listDataMap[code])
-    );
-    const products = await Promise.all(detailPromises);
+    const productList = response.data?.plpList?.productList || [];
     
-    const validProducts = products.filter(Boolean);
-    console.log(`✅ Got complete details for ${validProducts.length} products`);
-
-    return validProducts;
-
-  } catch (error) {
-    console.error('❌ H&M API Error:', error.message);
-    throw error;
+    if (productList.length === 0) break;
+    
+    allProducts = allProducts.concat(productList);
+    
+    if (allProducts.length >= maxProducts) break;
   }
-};
+
+  // Filter by query
+  const filtered = query ? filterByQuery(allProducts, query) : allProducts;
+  console.log(`📦 Fallback: Filtered to ${filtered.length} products matching "${query}"`);
+  
+  return await processProducts(filtered.slice(0, maxProducts));
+}
+
+function filterByQuery(productList, query) {
+  const queryLower = query.toLowerCase();
+  return productList.filter(p => {
+    const name = (p.productName || '').toLowerCase();
+    return name.includes(queryLower);
+  });
+}
+
+async function processProducts(productList) {
+  const listDataMap = {};
+  productList.forEach(p => {
+    const articleId = p.swatches?.[0]?.articleId || p.id;
+    if (articleId) {
+      listDataMap[articleId] = p;
+    }
+  });
+
+  const productCodes = Object.keys(listDataMap);
+  console.log(`📦 Processing ${productCodes.length} products for details...`);
+
+  const detailPromises = productCodes.map(code => 
+    fetchProductDetail(code, listDataMap[code])
+  );
+  const products = await Promise.all(detailPromises);
+  
+  const validProducts = products.filter(Boolean);
+  console.log(`✅ Got complete details for ${validProducts.length} products`);
+
+  return validProducts;
+}
 
 function getCategoryFromQuery(query) {
   if (!query) return 'ladies_all';
@@ -128,7 +216,7 @@ async function fetchProductDetail(productCode, listData) {
       id: data.code,
       title: data.name || 'Untitled Product',
       price: formatPrice(data, listData),
-      image: getProductImage(listData, data), // Use listData FIRST
+      image: getProductImage(listData, data),
       link: data.productUrl || `https://www2.hm.com/en_us/productpage.${data.code}.html`,
       composition: extractComposition(data),
       description: data.description || '',
@@ -141,58 +229,36 @@ async function fetchProductDetail(productCode, listData) {
   }
 }
 
-/**
- * Get product image - prioritize list response data
- */
 function getProductImage(listData, detailData) {
-  // PRIORITY 1: List response has the best images
   if (listData) {
-    if (listData.productImage) {
-      console.log('  🖼️ Using productImage from list');
-      return listData.productImage;
-    }
-    if (listData.modelImage) {
-      console.log('  🖼️ Using modelImage from list');
-      return listData.modelImage;
-    }
-    if (listData.images?.[0]?.url) {
-      console.log('  🖼️ Using images[0] from list');
-      return listData.images[0].url;
-    }
+    if (listData.productImage) return listData.productImage;
+    if (listData.modelImage) return listData.modelImage;
+    if (listData.images?.[0]?.url) return listData.images[0].url;
   }
 
-  // PRIORITY 2: Detail response galleryDetails
   if (detailData?.galleryDetails && detailData.galleryDetails.length > 0) {
     const mainImage = detailData.galleryDetails.find(img => 
       img.assetType === 'DESCRIPTIVESTILLLIFE'
     ) || detailData.galleryDetails[0];
     
-    if (mainImage?.baseUrl) {
-      console.log('  🖼️ Using galleryDetails from detail');
-      return mainImage.baseUrl;
-    }
+    if (mainImage?.baseUrl) return mainImage.baseUrl;
   }
 
-  // PRIORITY 3: Detail response images array
   if (detailData?.images && detailData.images.length > 0) {
     const imageUrl = detailData.images[0].baseUrl || detailData.images[0].url;
     if (imageUrl) {
-      console.log('  🖼️ Using images array from detail');
       return imageUrl.startsWith('http') ? imageUrl : `https:${imageUrl}`;
     }
   }
 
-  console.log('  ❌ No image found!');
   return 'https://via.placeholder.com/400?text=No+Image';
 }
 
 function formatPrice(detailData, listData) {
-  // Try detail response first
   let price = detailData?.whitePrice?.price || 
               detailData?.price?.value || 
               detailData?.redPrice?.value;
   
-  // Fallback to list response
   if (!price && listData?.prices?.[0]?.price) {
     price = listData.prices[0].price;
   }

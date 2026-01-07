@@ -1,70 +1,257 @@
-# Getting Started with Create React App
+# 🌿 Sustainable Fashion Tracker
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A web application that helps conscious consumers make informed clothing purchase decisions by analyzing fabric composition and providing sustainability recommendations.
 
-## Available Scripts
+![Project Banner](https://via.placeholder.com/800x200/4CAF50/FFFFFF?text=Sustainable+Fashion+Tracker)
 
-In the project directory, you can run:
+## 🎯 Overview
 
-### `npm start`
+The Sustainable Fashion Tracker empowers users to make environmentally conscious clothing choices by:
+- Searching H&M's product catalog
+- Analyzing fabric composition
+- Providing sustainability ratings based on material impact
+- Offering eco-friendly recommendations
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+**Why This Matters:** The fashion industry accounts for ~10% of global carbon emissions. By helping consumers choose sustainable materials, we can collectively reduce our environmental impact.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## ✨ Features
 
-### `npm test`
+### Core Functionality
+- 🔍 **Product Search** - Browse H&M products by category (dresses, tops, jeans, etc.)
+- 🧵 **Material Analysis** - View detailed fabric composition for each item
+- 🌱 **Sustainability Scoring** - Get eco-ratings based on material environmental impact
+- 💡 **Smart Recommendations** - Receive suggestions for more sustainable alternatives
+- 📊 **Visual Breakdown** - See material composition in an easy-to-read format
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🚀 Demo
 
-### `npm run build`
+**Live Demo:** [Link to deployed app - if available]
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+**Screenshots:**
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+| Home Page | Product Results | Material Analysis |
+|-----------|----------------|-------------------|
+| ![Home](![1767756518056](image/README/1767756518056.png)) | ![Results](screenshot2.png) | ![Analysis](screenshot3.png) |
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🛠️ Tech Stack
 
-### `npm run eject`
+### Frontend
+- **React** (v18+) - UI framework
+- **Axios** - HTTP client for API requests
+- **CSS3** - Styling
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### APIs
+- **H&M Hennes & Mauritz API** (via RapidAPI) - Product data and composition
+  - `/products/v2/list` - Product catalog
+  - `/products/detail` - Detailed product information
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Development Tools
+- **Node.js** (v16+)
+- **npm** - Package management
+- **Git** - Version control
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 📦 Installation
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Prerequisites
+- Node.js (v16 or higher)
+- npm or yarn
+- RapidAPI account with H&M API subscription
 
-## Learn More
+### Setup Steps
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/sustainable-fashion-tracker.git
+   cd sustainable-fashion-tracker
+   ```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-### Code Splitting
+3. **Configure API credentials**
+   
+   Create a `.env` file in the root directory:
+   ```env
+   REACT_APP_RAPIDAPI_KEY=your_rapidapi_key_here
+   REACT_APP_RAPIDAPI_HOST=apidojo-hm-hennes-mauritz-v1.p.rapidapi.com
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+   **To get your API key:**
+   - Sign up at [RapidAPI](https://rapidapi.com/)
+   - Subscribe to [H&M Hennes & Mauritz API](https://rapidapi.com/apidojo/api/hm-hennes-mauritz)
+   - Copy your API key from the dashboard
 
-### Analyzing the Bundle Size
+4. **Start the development server**
+   ```bash
+   npm start
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+5. **Open your browser**
+   
+   Navigate to `http://localhost:3000`
 
-### Making a Progressive Web App
+## 🎮 Usage
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Basic Workflow
 
-### Advanced Configuration
+1. **Search for Products**
+   - Enter a search term (e.g., "dress", "jeans", "hoodie")
+   - The app maps your search to H&M categories
+   - Results display with images and prices
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+2. **View Material Composition**
+   - Click on any product to see detailed fabric breakdown
+   - Composition shows percentage of each material
 
-### Deployment
+3. **Check Sustainability Score**
+   - Each material is rated on environmental impact
+   - Overall product score calculated automatically
+   - Color-coded ratings (green = good, red = poor)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+4. **Get Recommendations**
+   - Receive suggestions for more sustainable alternatives
+   - Learn about eco-friendly materials
 
-### `npm run build` fails to minify
+### Search Tips
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+| Search Term | Returns |
+|-------------|---------|
+| "dress" | Dresses from ladies_dresses category |
+| "jeans" | Denim from ladies_jeans category |
+| "hoodie" | Hoodies and sweatshirts |
+| "jacket" | Jackets and coats |
+| "" (empty) | All ladies items |
+
+## 🔌 API Integration
+
+### H&M API Workflow
+
+The app uses a two-endpoint approach:
+
+```javascript
+// 1. Get product list (fast, minimal data)
+GET /products/v2/list
+Params: { country, lang, page, pageSize, categoryId, sort }
+Returns: Product IDs, images, prices
+
+// 2. Get product details (slow, complete data)
+GET /products/detail
+Params: { productcode, country, lang }
+Returns: Full product info including fabric composition
+```
+
+### Rate Limits
+
+**Free Tier (Basic Plan):**
+- ~500 requests/month
+- ~20-30 requests/day
+
+**API Call Breakdown:**
+- 1 search = 6 API calls (1 list + 5 details)
+- Monthly quota = ~83 searches
+
+**Optimization Tips:**
+- Reduce `maxProducts` parameter to 3-5
+- Implement caching for repeated searches
+- Consider upgrading to paid tier for production
+
+### Material Composition Extraction
+
+```javascript
+// Response structure
+{
+  "compositions": [
+    {
+      "compositionType": "Shell",  // Main fabric
+      "materials": [
+        { "name": "Cotton", "percentage": "60.00" },
+        { "name": "Polyester", "percentage": "40.00" }
+      ]
+    }
+  ]
+}
+
+// Transformed to:
+{
+  "composition": {
+    "Cotton": 60,
+    "Polyester": 40
+  }
+}
+```
+
+## 📁 Project Structure
+
+```
+sustainable-fashion-tracker/
+├── public/
+│   ├── index.html
+│   └── favicon.ico
+├── src/
+│   ├── components/
+│   │   ├── HomePage.js          # Main search interface
+│   │   ├── ProductCard.js       # Individual product display
+│   │   └── MaterialAnalysis.js  # Composition breakdown
+│   ├── services/
+│   │   └── hmApi.js             # H&M API integration
+│   ├── utils/
+│   │   └── sustainability.js    # Scoring algorithms
+│   ├── App.js                   # Root component
+│   ├── App.css                  # Global styles
+│   └── index.js                 # Entry point
+├── .env                         # Environment variables (not in repo)
+├── .gitignore
+├── package.json
+└── README.md
+```
+
+### Key Files
+
+**`src/services/hmApi.js`**
+- H&M API integration
+- Product search and detail fetching
+- Material composition extraction
+- Category mapping
+
+**`src/components/HomePage.js`**
+- Search interface
+- Product display
+- State management
+
+**`src/utils/sustainability.js`** (if implemented)
+- Material sustainability ratings
+- Scoring algorithms
+- Recommendations engine
+
+
+### Inspiration & Resources
+- [Textile Exchange](https://textileexchange.org/) - Material sustainability data
+- [Good On You](https://goodonyou.eco/) - Fashion sustainability ratings
+- [Fashion Revolution](https://www.fashionrevolution.org/) - Sustainable fashion movement
+
+### Materials Sustainability Research
+- Organic cotton requires 91% less water than conventional cotton
+- Recycled polyester reduces carbon emissions by 32% compared to virgin polyester
+- Textile production accounts for ~20% of global clean water pollution
+
+## 🔮 Future Enhancements
+
+### Planned Features
+- [ ] Compare multiple products side-by-side
+- [ ] Save favorite sustainable products
+- [ ] Carbon footprint calculator
+- [ ] Price vs sustainability trade-off analysis
+- [ ] Integration with more retailers (Zara, Gap, etc.)
+- [ ] User accounts and purchase history tracking
+- [ ] Browser extension for on-site analysis
+- [ ] Mobile app (React Native)
+
+### Technical Improvements
+- [ ] Implement Redis caching
+- [ ] Add comprehensive testing (Jest, React Testing Library)
+- [ ] Improve accessibility (WCAG 2.1 AA compliance)
+- [ ] Add internationalization (i18n)
+- [ ] Optimize bundle size
+- [ ] Add service worker for offline functionality
