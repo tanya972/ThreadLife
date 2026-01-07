@@ -19,7 +19,6 @@ The Sustainable Fashion Tracker empowers users to make environmentally conscious
 ### Core Functionality
 - 🔍 **Product Search** - Browse H&M products by category (dresses, tops, jeans, etc.)
 - 🧵 **Material Analysis** - View detailed fabric composition for each item
-- 🌱 **Sustainability Scoring** - Get eco-ratings based on material environmental impact
 - 💡 **Smart Recommendations** - Receive suggestions for more sustainable alternatives
 - 📊 **Visual Breakdown** - See material composition in an easy-to-read format
 
@@ -31,7 +30,7 @@ The Sustainable Fashion Tracker empowers users to make environmentally conscious
 
 | Home Page | Product Results | Material Analysis |
 |-----------|----------------|-------------------|
-| ![Home](![1767756518056](image/README/1767756518056.png)) | ![Results](screenshot2.png) | ![Analysis](screenshot3.png) |
+| ![Home] ![1767757240064](image/README/1767757240064.png) | ![Results] ![1767757262806](image/README/1767757262806.png) | ![Analysis] ![1767757283719](image/README/1767757283719.png) |
 
 ## 🛠️ Tech Stack
 
@@ -124,108 +123,6 @@ The Sustainable Fashion Tracker empowers users to make environmentally conscious
 | "jacket" | Jackets and coats |
 | "" (empty) | All ladies items |
 
-## 🔌 API Integration
-
-### H&M API Workflow
-
-The app uses a two-endpoint approach:
-
-```javascript
-// 1. Get product list (fast, minimal data)
-GET /products/v2/list
-Params: { country, lang, page, pageSize, categoryId, sort }
-Returns: Product IDs, images, prices
-
-// 2. Get product details (slow, complete data)
-GET /products/detail
-Params: { productcode, country, lang }
-Returns: Full product info including fabric composition
-```
-
-### Rate Limits
-
-**Free Tier (Basic Plan):**
-- ~500 requests/month
-- ~20-30 requests/day
-
-**API Call Breakdown:**
-- 1 search = 6 API calls (1 list + 5 details)
-- Monthly quota = ~83 searches
-
-**Optimization Tips:**
-- Reduce `maxProducts` parameter to 3-5
-- Implement caching for repeated searches
-- Consider upgrading to paid tier for production
-
-### Material Composition Extraction
-
-```javascript
-// Response structure
-{
-  "compositions": [
-    {
-      "compositionType": "Shell",  // Main fabric
-      "materials": [
-        { "name": "Cotton", "percentage": "60.00" },
-        { "name": "Polyester", "percentage": "40.00" }
-      ]
-    }
-  ]
-}
-
-// Transformed to:
-{
-  "composition": {
-    "Cotton": 60,
-    "Polyester": 40
-  }
-}
-```
-
-## 📁 Project Structure
-
-```
-sustainable-fashion-tracker/
-├── public/
-│   ├── index.html
-│   └── favicon.ico
-├── src/
-│   ├── components/
-│   │   ├── HomePage.js          # Main search interface
-│   │   ├── ProductCard.js       # Individual product display
-│   │   └── MaterialAnalysis.js  # Composition breakdown
-│   ├── services/
-│   │   └── hmApi.js             # H&M API integration
-│   ├── utils/
-│   │   └── sustainability.js    # Scoring algorithms
-│   ├── App.js                   # Root component
-│   ├── App.css                  # Global styles
-│   └── index.js                 # Entry point
-├── .env                         # Environment variables (not in repo)
-├── .gitignore
-├── package.json
-└── README.md
-```
-
-### Key Files
-
-**`src/services/hmApi.js`**
-- H&M API integration
-- Product search and detail fetching
-- Material composition extraction
-- Category mapping
-
-**`src/components/HomePage.js`**
-- Search interface
-- Product display
-- State management
-
-**`src/utils/sustainability.js`** (if implemented)
-- Material sustainability ratings
-- Scoring algorithms
-- Recommendations engine
-
-
 ### Inspiration & Resources
 - [Textile Exchange](https://textileexchange.org/) - Material sustainability data
 - [Good On You](https://goodonyou.eco/) - Fashion sustainability ratings
@@ -237,16 +134,6 @@ sustainable-fashion-tracker/
 - Textile production accounts for ~20% of global clean water pollution
 
 ## 🔮 Future Enhancements
-
-### Planned Features
-- [ ] Compare multiple products side-by-side
-- [ ] Save favorite sustainable products
-- [ ] Carbon footprint calculator
-- [ ] Price vs sustainability trade-off analysis
-- [ ] Integration with more retailers (Zara, Gap, etc.)
-- [ ] User accounts and purchase history tracking
-- [ ] Browser extension for on-site analysis
-- [ ] Mobile app (React Native)
 
 ### Technical Improvements
 - [ ] Implement Redis caching
