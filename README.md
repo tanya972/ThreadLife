@@ -1,6 +1,6 @@
 # 🌿 Sustainable Fashion Tracker
 
-A web application that helps conscious consumers make informed clothing purchase decisions by analyzing fabric composition and providing sustainability recommendations.
+A web application that helps conscious consumers make informed clothing purchase decisions by analyzing fabric composition and providing sustainability recommendations. See at: https://ecofabric.vercel.app/
 
 ## 🎯 Overview
 
@@ -8,7 +8,6 @@ The Sustainable Fashion Tracker empowers users to make environmentally conscious
 - Searching H&M's product catalog
 - Analyzing fabric composition
 - Providing sustainability ratings based on material impact
-- Offering eco-friendly recommendations
 
 **Why This Matters:** The fashion industry accounts for ~10% of global carbon emissions. By helping consumers choose sustainable materials, we can collectively reduce our environmental impact.
 
